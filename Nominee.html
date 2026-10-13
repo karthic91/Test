@@ -1,0 +1,244 @@
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div>
+      <div class="brand">
+        <i class="bi bi-star"></i>
+        <div>
+          <div class="brand-name">Stellar</div>
+          <div class="brand-sub">RECOGNITION PORTAL</div>
+        </div>
+      </div>
+      <a class="nav-item active"><i class="bi bi-trophy"></i> Nomination</a>
+    </div>
+
+    <div>
+      <div class="cycle">
+        <i class="bi bi-calendar3"></i>
+        <div>
+          <div class="fw-semibold">Q2 2026 cycle</div>
+          <small>Apr 1 – Jun 30, 2026</small>
+        </div>
+      </div>
+      <div class="user">
+        <div class="avatar">R</div>
+        <div class="flex-grow-1">
+          <div class="fw-semibold">Robert</div>
+          <small>Manager</small>
+        </div>
+        <i class="bi bi-chevron-down"></i>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <header class="topbar">
+      <small>People &amp; Culture</small>
+      <h6>Stellar Awards</h6>
+    </header>
+
+    <div class="content">
+      <nav class="crumbs"><a>Nomination</a> <i class="bi bi-chevron-right"></i> <span>Create an award nomination</span></nav>
+      <h1>Create an award nomination</h1>
+
+      <!-- Stepper -->
+      <div class="card-box stepper">
+        <ng-container *ngFor="let s of steps; let last = last">
+          <div class="step" [class.active]="s.no === currentStep">
+            <span class="dot">{{ s.no }}</span>
+            <span class="lbl">{{ s.label }}</span>
+          </div>
+          <div class="line" *ngIf="!last"></div>
+        </ng-container>
+      </div>
+
+      <div class="layout">
+        <!-- Form -->
+        <section class="card-box form-card">
+          <label class="lbl-req">Award type <span>*</span></label>
+          <div class="row g-3 mb-2">
+            <div class="col-6">
+              <div class="type-card" [class.selected]="form.type === 'team'" (click)="setType('team')">
+                <div class="type-icon"><i class="bi bi-people"></i></div>
+                <div>
+                  <div class="t">Team</div>
+                  <div class="d">Nominate a team for their collective achievement</div>
+                </div>
+                <span class="radio"></span>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="type-card" [class.selected]="form.type === 'individual'" (click)="setType('individual')">
+                <div class="type-icon"><i class="bi bi-person"></i></div>
+                <div>
+                  <div class="t">Individual</div>
+                  <div class="d">Nominate an individual for their contributions</div>
+                </div>
+                <span class="radio"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="info">
+            <i class="bi bi-info-circle-fill"></i>
+            <span *ngIf="form.type === 'team'">Team nominations require team details and the eligible team award category.</span>
+            <span *ngIf="form.type === 'individual'">Individual nominations require nominee details and an eligible individual award category.</span>
+          </div>
+
+          <!-- TEAM -->
+          <ng-container *ngIf="form.type === 'team'">
+            <div class="field">
+              <label class="lbl-req">Team name <span>*</span></label>
+              <input class="form-control" [(ngModel)]="form.teamName" placeholder="Enter team name">
+            </div>
+            <div class="field">
+              <label class="lbl-req">Team members <span>*</span></label>
+              <div class="members-box">
+                <span class="chip" *ngFor="let m of form.members">
+                  {{ m }} <i class="bi bi-x-lg" (click)="removeMember(m)"></i>
+                </span>
+                <select class="member-select" (change)="addMember($any($event.target).value); $any($event.target).value=''">
+                  <option value="" selected></option>
+                  <option *ngFor="let e of availableMembers" [value]="e.name">{{ e.name }}</option>
+                </select>
+              </div>
+              <small class="hint">{{ form.members.length }} members selected</small>
+            </div>
+          </ng-container>
+
+          <!-- INDIVIDUAL -->
+          <ng-container *ngIf="form.type === 'individual'">
+            <div class="field">
+              <label class="lbl-req">Nominee name <span>*</span></label>
+              <select class="form-select" [(ngModel)]="form.nominee" (ngModelChange)="onNomineeChange()">
+                <option value="">Select nominee</option>
+                <option *ngFor="let e of employees" [value]="e.name">{{ e.name }}</option>
+              </select>
+              <small class="hint" *ngIf="nominee">{{ nominee.id }} · {{ nominee.dept }}</small>
+            </div>
+            <div class="row g-3 field">
+              <div class="col-6">
+                <label class="lbl-req">Business unit <span>*</span></label>
+                <select class="form-select" [(ngModel)]="form.bu">
+                  <option *ngFor="let b of businessUnits" [value]="b">{{ b }}</option>
+                </select>
+              </div>
+              <div class="col-6">
+                <label class="lbl-req">Corporate title <span>*</span></label>
+                <select class="form-select" [(ngModel)]="form.title">
+                  <option *ngFor="let t of titles" [value]="t">{{ t }}</option>
+                </select>
+              </div>
+            </div>
+          </ng-container>
+
+          <div class="row g-3 field">
+            <div class="col-6">
+              <label class="lbl-req">Nomination period <span>*</span></label>
+              <select class="form-select" [(ngModel)]="form.period">
+                <option *ngFor="let p of periods" [value]="p">{{ p }}</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="lbl-req">Award category <span>*</span></label>
+              <select class="form-select" [(ngModel)]="form.category">
+                <option value="">Select category</option>
+                <option *ngFor="let c of categories[form.type]" [value]="c.name">{{ c.name }}</option>
+              </select>
+              <small class="hint d-block">{{ categoryDesc }}</small>
+              <small class="hint tiny d-block" *ngIf="form.type === 'individual'">
+                Eligible categories are based on nominee profile and nomination period.
+              </small>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="lbl-req">Reason for nomination <span>*</span></label>
+            <div class="textarea-wrap">
+              <textarea class="form-control" rows="3" [maxlength]="maxLen" [(ngModel)]="form.reason"
+                [placeholder]="'Explain the achievement, measurable impact and why this ' + form.type + ' deserves recognition...'"></textarea>
+              <span class="counter">{{ form.reason.length }} / 1,000</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="lbl-req">Supporting evidence <span class="opt">(optional)</span></label>
+            <div class="upload">
+              <i class="bi bi-upload"></i> <a>Upload files</a> or drag and drop
+            </div>
+            <small class="hint d-block text-center">Documents, images or links · Max 10 MB per file</small>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-outline-secondary btn-clear" (click)="clear()">Clear</button>
+            <button class="btn btn-draft" (click)="saveDraft()">Save draft</button>
+            <button class="btn btn-primary-green" (click)="continue()">Continue to review <i class="bi bi-arrow-right"></i></button>
+          </div>
+        </section>
+
+        <!-- Right column -->
+        <aside class="side">
+          <div class="tip">
+            <h5><i class="bi bi-lightbulb"></i> A strong {{ form.type }} nomination</h5>
+            <ul>
+              <li>{{ form.type === 'team' ? 'Describe the shared achievement.' : 'Describe the specific achievement.' }}</li>
+              <li>Include measurable impact.</li>
+              <li>{{ form.type === 'team' ? 'Explain each member\'s contribution.' : 'Explain the individual\'s contribution.' }}</li>
+            </ul>
+          </div>
+
+          <div class="card-box">
+            <h6 class="card-title-g"><i class="bi bi-file-earmark-text"></i> Nomination summary</h6>
+            <dl class="summary">
+              <ng-container *ngIf="form.type === 'team'">
+                <dt>Award type</dt><dd>Team</dd>
+                <dt>Team name</dt><dd>{{ form.teamName || '—' }}</dd>
+                <dt>Members</dt><dd>{{ form.members.length }}</dd>
+                <dt>Category</dt><dd>{{ form.category || '—' }}</dd>
+                <dt>Period</dt><dd>{{ form.period }}</dd>
+              </ng-container>
+              <ng-container *ngIf="form.type === 'individual'">
+                <dt>Award type</dt><dd>Individual</dd>
+                <dt>Nominee</dt><dd>{{ form.nominee || '—' }}</dd>
+                <dt>Business unit</dt><dd>{{ form.bu || '—' }}</dd>
+                <dt>Corporate title</dt><dd>{{ form.title || '—' }}</dd>
+                <dt>Category</dt><dd>{{ form.category || '—' }}</dd>
+                <dt>Period</dt><dd>{{ form.period }}</dd>
+              </ng-container>
+            </dl>
+            <hr>
+            <div class="d-flex justify-content-between completion"><span>Completion</span><span>{{ completion }}% complete</span></div>
+            <div class="progress"><div class="progress-bar" [style.width.%]="completion"></div></div>
+          </div>
+
+          <div class="card-box">
+            <h6 class="card-title-g"><i class="bi bi-book"></i> Award category guide</h6>
+            <div class="guide-row">
+              <span class="g-ico"><i class="bi bi-people"></i></span>
+              <b>TEAM</b>
+              <div><b>ORION</b> · Quarterly</div>
+            </div>
+            <div class="guide-row">
+              <span class="g-ico"><i class="bi bi-person"></i></span>
+              <b>INDIVIDUAL</b>
+              <div>
+                <div><b>ANTARES</b> · Quarterly</div>
+                <div><b>LODESTAR</b> · Quarterly · People Manager</div>
+                <div><b>RISING STAR</b> · Monthly</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-box">
+            <h6 class="card-title-g"><i class="bi bi-calendar3"></i> Nomination deadline</h6>
+            <div>Submission closes</div>
+            <div class="deadline">24 June 2026</div>
+            <div class="text-muted">Complete your nomination before the cycle closes.</div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+</div>
+
