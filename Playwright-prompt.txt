@@ -1,0 +1,340 @@
+Master Prompt: Migrate Complete Protractor Framework to Playwright
+
+Act as a Senior Test Automation Architect and Playwright Migration Specialist with extensive experience in Protractor, TypeScript, Cucumber BDD, Selenium WebDriver, and Playwright.
+
+Objective
+
+Migrate my complete existing Protractor + TypeScript + Cucumber BDD automation framework to Playwright + TypeScript + Cucumber.js.
+
+The goal is to replace Protractor completely while preserving all existing test scenarios, business validations, reusable utilities, and automation functionality.
+
+This must be a complete framework migration, not just a sample conversion.
+
+1. Analyze the Existing Project
+
+Before modifying any files, analyze the entire existing project, including:
+
+* All .feature files
+* Page Object Model (POM) classes
+* Step definition files
+* Before, After, BeforeAll, and AfterAll hooks
+* Protractor configuration files
+* TypeScript configuration
+* Package dependencies
+* Environment configuration files
+* Custom utility and helper classes
+* Test data files (JSON, CSV, etc.)
+* Screenshot and reporting utilities
+* Browser initialization and teardown
+* Authentication and session management
+* CI/CD configuration
+
+Identify all Protractor-specific APIs and dependencies.
+
+Generate a migration inventory showing which files can be reused, which require modification, and which must be replaced.
+
+2. Target Framework Architecture
+
+Use the following technologies:
+
+* Playwright
+* TypeScript
+* Cucumber.js
+* Page Object Model
+* Node.js
+* Playwright assertions
+* Cucumber HTML or JSON reporting
+* Allure reporting, if already supported or required
+* Environment-based configuration
+
+Use the official Playwright APIs and compatible current stable package versions.
+
+Maintain a clean, scalable, enterprise-level folder structure.
+
+Suggested structure:
+
+playwright-framework/
+├── features/
+│   ├── login.feature
+│   └── ...
+├── src/
+│   ├── pages/
+│   ├── step-definitions/
+│   ├── support/
+│   │   ├── hooks.ts
+│   │   ├── world.ts
+│   │   └── browser-manager.ts
+│   ├── utils/
+│   ├── fixtures/
+│   └── config/
+├── test-data/
+├── reports/
+├── screenshots/
+├── cucumber.js
+├── package.json
+├── tsconfig.json
+└── README.md
+
+Adapt the structure to the existing project where appropriate.
+
+3. Preserve All Feature Files
+
+* Retain all existing .feature files.
+* Preserve feature names, scenario names, scenario outlines, tags, and examples.
+* Preserve existing Given, When, Then, And, and But steps.
+* Do not modify business scenarios unless absolutely necessary.
+* Ensure every feature step has a matching step definition.
+* Avoid introducing duplicate or ambiguous step definitions.
+* Maintain existing tag-based execution.
+
+4. Convert All Page Objects
+
+Convert every Protractor page object to Playwright.
+
+Replace Protractor APIs with appropriate Playwright equivalents.
+
+Examples:
+
+Protractor	Playwright
+browser.get(url)	page.goto(url)
+element(by.id('id'))	page.locator('#id')
+element(by.css('selector'))	page.locator('selector')
+element.all(by.css('selector'))	page.locator('selector')
+sendKeys()	fill() or pressSequentially()
+getText()	textContent() or innerText()
+getAttribute()	getAttribute()
+isDisplayed()	isVisible()
+browser.sleep()	Appropriate condition-based waiting
+ExpectedConditions	Playwright auto-waiting and assertions
+browser.switchTo()	Playwright page, frame, or context APIs
+
+Important requirements:
+
+* Prefer semantic locators such as getByRole, getByLabel, and getByTestId where reliable.
+* Preserve working CSS and XPath selectors where appropriate.
+* Implement asynchronous operations correctly using async/await.
+* Avoid unnecessary hardcoded waits.
+* Handle Angular components, dynamic elements, tables, dropdowns, dialogs, iframes, and new browser tabs.
+* Preserve reusable page methods and business logic.
+* Do not silently change locator behavior or test validations.
+
+5. Convert All Step Definitions
+
+Migrate every existing Cucumber step definition to Playwright.
+
+Requirements:
+
+* Preserve existing step expressions and regular expressions.
+* Preserve scenario parameters and data tables.
+* Use TypeScript throughout.
+* Use a custom Cucumber World to access the current scenario’s Playwright Page and BrowserContext.
+* Instantiate page objects using the correct scenario page.
+* Preserve all existing assertions and business validations.
+* Handle asynchronous methods properly.
+* Avoid shared mutable page or browser state between parallel scenarios.
+
+Do not leave any Protractor references in migrated step definitions.
+
+6. Browser Management and Hooks
+
+Implement proper browser lifecycle management.
+
+Requirements:
+
+* Launch browsers using Playwright.
+* Support Chromium, Firefox, and WebKit.
+* Create isolated browser contexts for individual scenarios.
+* Implement Before and After hooks.
+* Support BeforeAll and AfterAll where appropriate.
+* Capture screenshots on failure.
+* Capture traces for failed scenarios where configured.
+* Close pages and contexts reliably.
+* Support headless and headed execution.
+* Support configurable viewport sizes.
+* Support parallel execution without scenario data leakage.
+
+Use Cucumber.js lifecycle hooks rather than assuming Playwright Test runner fixtures are available.
+
+7. Assertions and Synchronization
+
+Replace existing Jasmine, Chai, or Protractor assertions with suitable Playwright assertions.
+
+Use Playwright’s expect API where appropriate.
+
+* Preserve original validation behavior.
+* Prefer retrying locator assertions for dynamic UI states.
+* Handle asynchronous Angular application rendering.
+* Replace arbitrary sleeps with appropriate waits.
+* Use configurable timeouts.
+* Avoid networkidle as a universal page-readiness strategy.
+
+8. Environment Configuration
+
+Support multiple environments, such as:
+
+* DEV
+* QA
+* UAT
+* PROD, only where test execution is explicitly permitted
+
+Configuration should support:
+
+* Base URL
+* Browser selection
+* Headless mode
+* Default timeouts
+* Screenshot settings
+* Trace settings
+* Reporting configuration
+* Parallel execution settings
+* Test credentials through environment variables or secure secret management
+
+Do not hardcode passwords, access tokens, or other secrets.
+
+9. Reporting
+
+Implement or migrate existing reporting functionality.
+
+Include:
+
+* Cucumber JSON report
+* HTML report
+* Passed, failed, and skipped scenario information
+* Screenshots on failure
+* Error messages and stack traces
+* Execution duration
+* Allure integration if required
+
+Ensure reporting works with Cucumber.js.
+
+Do not assume Playwright Test’s built-in HTML reporter works directly with the Cucumber.js runner.
+
+10. Test Execution
+
+Configure npm scripts for:
+
+* Running all scenarios
+* Running scenarios by tags
+* Running a specific feature file
+* Running in headed mode
+* Running in headless mode
+* Selecting browsers
+* Selecting environments
+* Generating reports
+* TypeScript type checking
+
+Ensure commands work with the chosen Cucumber.js configuration.
+
+11. Remove Protractor Dependencies
+
+After successful migration:
+
+* Remove Protractor.
+* Remove obsolete Selenium WebDriver dependencies if no longer used.
+* Remove obsolete Protractor configuration.
+* Remove unused browser-driver management scripts.
+* Remove deprecated helper utilities.
+* Update package.json and the lockfile.
+* Ensure the project contains no active imports from protractor.
+
+Do not remove unrelated dependencies that are still required.
+
+12. Migration Rules
+
+Follow these strict rules:
+
+1. Do not skip any feature file, page object, or step definition.
+2. Do not remove or simplify business validation logic.
+3. Do not change feature step wording unnecessarily.
+4. Do not introduce hardcoded test data where reusable data already exists.
+5. Do not convert only a few sample files and claim completion.
+6. Do not use deprecated Playwright APIs.
+7. Do not mix JavaScript and TypeScript for application test source files.
+8. Do not use the Playwright Test runner as the primary runner; retain Cucumber.js.
+9. Do not modify the application source code unless explicitly requested.
+10. Preserve existing functionality and test coverage.
+11. Use reusable, maintainable code.
+12. Do not mark migration complete until validation has been performed.
+
+13. Migration Execution Strategy
+
+Perform migration in phases.
+
+Phase 1 — Assessment
+
+Scan the project and produce a complete inventory of all files, dependencies, and Protractor APIs.
+
+Phase 2 — Framework Setup
+
+Create the Playwright + TypeScript + Cucumber.js configuration, browser management, hooks, World, and reporting infrastructure.
+
+Phase 3 — Page Object Migration
+
+Convert all page objects while preserving existing business methods.
+
+Phase 4 — Step Definition Migration
+
+Convert every step definition and connect it to the corresponding Playwright page objects.
+
+Phase 5 — Utilities and Test Data
+
+Migrate reusable utilities, environment configurations, test data handling, and authentication logic.
+
+Phase 6 — Validation
+
+Run TypeScript compilation, verify feature-to-step mappings, and execute available test scenarios.
+
+Phase 7 — Cleanup
+
+Remove obsolete Protractor dependencies and update documentation.
+
+14. Final Validation Checklist
+
+Before declaring completion, verify:
+
+* [ ]	All feature files are retained.
+* [ ]	All page objects are migrated.
+* [ ]	All step definitions are migrated.
+* [ ]	No undefined Cucumber steps remain.
+* [ ]	No duplicate or ambiguous step definitions remain.
+* [ ]	No active Protractor API usage remains.
+* [ ]	TypeScript compilation succeeds.
+* [ ]	Browser initialization works.
+* [ ]	Hooks execute correctly.
+* [ ]	Environment configuration works.
+* [ ]	Reporting works.
+* [ ]	Failure screenshots work.
+* [ ]	Test isolation is maintained.
+* [ ]	Existing scenarios have been executed where an environment is available.
+* [ ]	All failures and unverified tests are documented.
+
+15. Expected Deliverables
+
+Provide:
+
+1. Complete migrated Playwright framework.
+2. Updated folder structure.
+3. Updated package.json.
+4. Updated TypeScript and Cucumber configuration.
+5. Converted page objects.
+6. Converted step definitions.
+7. Browser management and hooks.
+8. Reusable utilities.
+9. Reporting configuration.
+10. Updated README with installation and execution commands.
+11. Migration summary with file counts and remaining issues.
+12. Validation results with passed, failed, blocked, and unexecuted scenarios.
+
+Final Instruction
+
+Start by analyzing the complete existing project. Then perform the migration across the entire repository.
+
+Do not stop after generating a sample implementation.
+
+If the repository is too large to migrate in one pass, process it in manageable batches, maintain a migration checklist, and continue until all relevant files have been processed.
+
+Make actual code changes when repository editing is available. Otherwise, generate complete replacement files with their paths.
+
+Never claim a test has passed unless it was actually executed successfully.
+
+The final result must be a maintainable, production-ready Playwright + TypeScript + Cucumber BDD framework with functional equivalence to the original Protractor automation project.
