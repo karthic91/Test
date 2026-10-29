@@ -1,0 +1,588 @@
+MASTER PROMPT — Complete Protractor to Playwright BDD Migration
+
+Role
+
+Act as a Principal Test Automation Architect and Senior TypeScript Engineer specializing in enterprise automation framework modernization.
+
+You have expert knowledge of:
+
+* Protractor and Selenium WebDriver
+* Playwright Test
+* playwright-bdd
+* TypeScript
+* Cucumber/Gherkin
+* Page Object Model (POM)
+* Playwright fixtures
+* Angular application testing
+* CI/CD automation
+* Test reporting, debugging, and parallel execution
+
+Primary Objective
+
+Migrate my entire existing Protractor + TypeScript + Cucumber BDD automation project into Playwright BDD + TypeScript using playwright-bdd and the native Playwright Test runner.
+
+This is a complete framework modernization, not a partial code conversion.
+
+Mandatory Target Technology
+
+* Browser automation: Playwright
+* Test runner: @playwright/test
+* BDD integration: playwright-bdd
+* Programming language: TypeScript only
+* Feature specifications: Gherkin .feature files
+* Design pattern: Page Object Model
+* Dependency injection: Playwright fixtures
+* Assertions: Playwright expect
+* Reporting: Playwright HTML, JUnit, and optional Allure
+* Configuration: playwright.config.ts
+* Package management: Preserve the existing package manager unless migration requires otherwise
+
+Do not use Cucumber.js as a separate test runner.
+
+Do not retain Protractor or Selenium WebDriver for migrated UI tests.
+
+⸻
+
+PHASE 1 — Complete Project Analysis
+
+Before making any code changes, scan the entire existing repository.
+
+Analyze all:
+
+1. .feature files
+2. Step definition files
+3. Page object classes
+4. Protractor configuration files
+5. Cucumber configuration
+6. Hooks and lifecycle management
+7. Utility and helper classes
+8. Test data and fixtures
+9. Environment configuration
+10. Authentication and session management
+11. Custom assertions
+12. Reporting utilities
+13. CI/CD pipelines
+14. npm scripts
+15. TypeScript configuration
+16. Browser-specific implementations
+17. External integrations and custom plugins
+
+Identify Protractor-specific usage, including:
+
+* browser
+* element
+* element.all
+* by
+* ExpectedConditions
+* protractor
+* ElementFinder
+* ElementArrayFinder
+* browser.wait
+* browser.sleep
+* browser.actions
+* browser.executeScript
+* browser.switchTo
+* browser.getAllWindowHandles
+* browser.params
+* browser.restart
+* browser.refresh
+* browser.waitForAngular
+* browser.ignoreSynchronization
+
+Also identify custom wrappers around Protractor APIs.
+
+Required Output
+
+Produce a migration inventory containing:
+
+Original File	File Type	Dependencies	Migration Action	Status
+login.feature	Feature	Gherkin	Reuse	Pending
+login.steps.ts	Step definitions	Cucumber, Protractor	Convert	Pending
+login.page.ts	Page object	Protractor	Convert	Pending
+hooks.ts	Hooks	Cucumber	Replace	Pending
+
+Include every relevant file.
+
+Record total counts of feature files, scenarios, step definitions, page objects, and utilities.
+
+Do not begin bulk migration until the analysis is complete.
+
+⸻
+
+PHASE 2 — Create the New Framework Architecture
+
+Use the following structure as a reference:
+
+playwright-bdd-framework/
+├── features/
+│   ├── login.feature
+│   ├── dashboard.feature
+│   └── ...
+├── src/
+│   ├── pages/
+│   │   ├── LoginPage.ts
+│   │   └── ...
+│   ├── steps/
+│   │   ├── login.steps.ts
+│   │   └── ...
+│   ├── fixtures/
+│   │   └── test.fixture.ts
+│   ├── support/
+│   │   ├── hooks.ts
+│   │   └── ...
+│   ├── utils/
+│   ├── config/
+│   └── types/
+├── test-data/
+├── .features-gen/
+├── playwright.config.ts
+├── package.json
+├── tsconfig.json
+├── .gitignore
+└── README.md
+
+Adapt this structure when existing project conventions provide a better organization.
+
+Do not duplicate utilities or create unnecessary abstraction layers.
+
+Use playwright-bdd to generate Playwright tests from Gherkin scenarios.
+
+Use the package’s supported configuration APIs for the installed version.
+
+Do not assume Cucumber.js runtime hooks or World objects are available.
+
+⸻
+
+PHASE 3 — Preserve Existing Feature Files
+
+Retain every existing .feature file.
+
+Preserve:
+
+* Feature names
+* Scenario names
+* Scenario outlines
+* Examples
+* Background steps
+* Given/When/Then/And/But statements
+* Tags
+* Data tables
+* Doc strings
+* Business validations
+
+Do not rewrite scenarios simply to make migration easier.
+
+Ensure every Gherkin step maps to a valid Playwright BDD step definition.
+
+Detect and resolve undefined, ambiguous, and duplicate step definitions without changing intended business behavior.
+
+Preserve existing tag-based execution capabilities.
+
+⸻
+
+PHASE 4 — Convert All Page Objects
+
+Migrate every existing Protractor page object to Playwright.
+
+Use Page, Locator, FrameLocator, and other appropriate Playwright APIs.
+
+API Migration Examples
+
+Protractor	Playwright
+browser.get(url)	page.goto(url)
+element(by.id('name'))	page.locator('#name')
+element(by.css('.item'))	page.locator('.item')
+element.all(by.css('.item'))	page.locator('.item')
+sendKeys()	fill() or pressSequentially()
+getText()	innerText() or textContent()
+click()	click()
+isDisplayed()	isVisible()
+getAttribute()	getAttribute()
+browser.refresh()	page.reload()
+browser.executeScript()	page.evaluate()
+browser.sleep()	Condition-based waiting
+ExpectedConditions	Playwright locator assertions and waits
+
+These are examples, not universal one-to-one replacements. Preserve the semantics of each original operation.
+
+Page Object Requirements
+
+1. Use constructor-based dependency injection for Page.
+2. Use Playwright Locator objects.
+3. Prefer stable semantic locators where appropriate.
+4. Preserve existing reusable methods.
+5. Preserve business logic.
+6. Use async/await correctly.
+7. Avoid unnecessary fixed delays.
+8. Avoid duplicate locator definitions.
+9. Support dynamic Angular components.
+10. Preserve custom grid, table, modal, dropdown, and navigation functionality.
+
+Handle special scenarios including:
+
+* Angular Material controls
+* AG Grid
+* Dynamic tables
+* Autocomplete dropdowns
+* Iframes
+* Multiple tabs and windows
+* File uploads and downloads
+* Alerts and dialogs
+* Date pickers
+* Pagination
+* Lazy-loaded components
+* Network-dependent UI updates
+
+Do not replace existing locators without verifying that their new behavior is equivalent.
+
+⸻
+
+PHASE 5 — Convert All Step Definitions to Playwright BDD
+
+Migrate every existing Cucumber step definition to playwright-bdd.
+
+Use the supported createBdd() API and Playwright fixtures.
+
+Existing Protractor Example
+
+import { Given, When, Then } from '@cucumber/cucumber';
+import { browser } from 'protractor';
+Given('user opens the application', async () => {
+  await browser.get('https://example.com');
+});
+
+Target Playwright BDD Example
+
+import { createBdd } from 'playwright-bdd';
+import { test } from '../fixtures/test.fixture';
+const { Given, When, Then } = createBdd(test);
+Given('user opens the application', async ({ page }) => {
+  await page.goto('/');
+});
+
+Adapt imports and configuration to the installed playwright-bdd version.
+
+Mandatory Requirements
+
+* Preserve all step expressions.
+* Preserve parameter handling.
+* Preserve scenario outline parameters.
+* Preserve data table behavior.
+* Preserve business assertions.
+* Preserve reusable page object methods.
+* Use fixture injection instead of global browser variables.
+* Avoid shared mutable state between scenarios.
+* Ensure asynchronous execution is correct.
+* Convert every step definition file.
+
+Do not leave old Cucumber.js runner dependencies in migrated test execution code.
+
+⸻
+
+PHASE 6 — Implement Playwright Fixtures
+
+Create a reusable fixture architecture using Playwright Test.
+
+Provide fixtures for:
+
+* Page objects
+* Authentication
+* Test data
+* Environment configuration
+* Shared utilities
+* Scenario-specific state
+
+Use test-scoped fixtures by default.
+
+Use worker-scoped fixtures only when shared execution is safe.
+
+Ensure scenarios running in parallel cannot modify each other’s state unexpectedly.
+
+Do not create unnecessary custom browser managers when Playwright’s native browser, context, and page fixtures already satisfy the requirement.
+
+⸻
+
+PHASE 7 — Migrate Hooks and Lifecycle Management
+
+Analyze existing Cucumber hooks and migrate their behavior to supported Playwright BDD hooks, Playwright fixtures, or native Playwright Test lifecycle APIs.
+
+Preserve:
+
+* Scenario initialization
+* Test data preparation
+* Login setup
+* Database or API prerequisites
+* Cleanup
+* Screenshot capture
+* Reporting attachments
+* Environment-specific setup
+
+Implement:
+
+* Before-scenario behavior
+* After-scenario behavior
+* Failure screenshots
+* Trace capture
+* Cleanup after failure
+* Browser context isolation
+
+Use native Playwright configuration for retries, screenshots, traces, and video where appropriate.
+
+Do not directly copy Cucumber.js hooks without adapting them to the new execution architecture.
+
+⸻
+
+PHASE 8 — Assertions and Synchronization
+
+Replace Protractor, Jasmine, or Chai UI assertions with Playwright assertions where appropriate.
+
+Prefer:
+
+await expect(locator).toBeVisible();
+await expect(locator).toHaveText('Expected value');
+await expect(locator).toBeEnabled();
+await expect(page).toHaveURL(/dashboard/);
+
+Preserve the intent of every existing assertion.
+
+Use Playwright auto-waiting and retrying assertions.
+
+Replace unnecessary hardcoded waits.
+
+Handle:
+
+* Asynchronous Angular rendering
+* Loading indicators
+* API-driven updates
+* Dynamic content
+* Navigation
+* Delayed elements
+
+Avoid relying on networkidle as a universal application readiness condition.
+
+Do not silently remove assertions that are difficult to migrate.
+
+⸻
+
+PHASE 9 — Environment and Browser Configuration
+
+Create a maintainable playwright.config.ts.
+
+Support:
+
+* Chromium
+* Firefox
+* WebKit
+* Headed and headless execution
+* DEV, QA, and UAT environments
+* Base URL configuration
+* Configurable timeouts
+* Retries
+* Parallel workers
+* Screenshots
+* Video
+* Trace viewer
+* CI-specific settings
+
+Preserve existing environment behavior.
+
+Use environment variables for sensitive values.
+
+Do not hardcode credentials or secrets.
+
+Preserve existing configuration files where they contain reusable information.
+
+⸻
+
+PHASE 10 — Reporting and Debugging
+
+Implement reporting using native Playwright capabilities.
+
+Required:
+
+* Playwright HTML reports
+* JUnit XML reports
+* Test execution summaries
+* Failure screenshots
+* Playwright traces
+* Error stack traces
+
+Optional:
+
+* Allure reporting
+* CI artifact publishing
+* Test execution dashboards
+
+Ensure generated BDD scenarios appear meaningfully in reports.
+
+Preserve existing reporting requirements where possible.
+
+⸻
+
+PHASE 11 — Parallel Execution and CI/CD
+
+Configure reliable parallel execution.
+
+Ensure:
+
+* Test isolation
+* Independent browser contexts
+* No shared mutable scenario state
+* Stable test data management
+* Configurable worker counts
+* Retry support
+* Browser-specific execution
+
+Update existing CI/CD configuration without changing unrelated pipeline behavior.
+
+Support commands for:
+
+* All tests
+* Specific features
+* Tag-filtered scenarios
+* Browser selection
+* Environment selection
+* Headed debugging
+* Report generation
+
+Document the exact npm commands.
+
+⸻
+
+PHASE 12 — Remove Legacy Dependencies
+
+After successful migration, identify and remove obsolete dependencies such as:
+
+* protractor
+* protractor-cucumber-framework
+* Selenium WebDriver dependencies used only by Protractor
+* WebDriver manager scripts
+* Obsolete Protractor configuration
+* Legacy browser initialization helpers
+* Unused Jasmine dependencies
+* Unused Cucumber.js runner dependencies
+
+Retain any dependency still required by unrelated project functionality.
+
+Update package.json and the package lockfile.
+
+Do not remove files before verifying that their functionality has been migrated.
+
+⸻
+
+PHASE 13 — Complete Project Validation
+
+Perform the following checks:
+
+1. Run TypeScript compilation.
+2. Validate Playwright configuration.
+3. Generate Playwright BDD tests.
+4. Verify all feature files are included.
+5. Detect undefined step definitions.
+6. Detect ambiguous or duplicate step definitions.
+7. Validate imports and module resolution.
+8. Verify page object construction.
+9. Verify fixtures and hooks.
+10. Execute smoke tests.
+11. Execute the full suite when the environment is available.
+12. Verify reports and traces.
+13. Search for remaining Protractor references.
+14. Compare original and migrated scenario coverage.
+
+Distinguish code compilation from actual test execution.
+
+Do not claim successful migration solely because TypeScript compilation succeeds.
+
+Document tests that cannot run because of missing credentials, unavailable environments, or external dependencies.
+
+⸻
+
+PHASE 14 — Migration Coverage Report
+
+Generate a report containing:
+
+Metric	Original	Migrated	Remaining
+Feature files	Actual count	Actual count	Actual count
+Scenarios	Actual count	Actual count	Actual count
+Step definitions	Actual count	Actual count	Actual count
+Page objects	Actual count	Actual count	Actual count
+Utility files	Actual count	Actual count	Actual count
+
+Do not invent counts.
+
+Also include:
+
+* Files successfully migrated
+* Files requiring manual intervention
+* Unresolved dependencies
+* Unsupported APIs
+* Remaining test failures
+* Test execution results
+* Known behavioral differences
+
+⸻
+
+PHASE 15 — Final Deliverables
+
+Deliver a complete working repository containing:
+
+1. Playwright BDD framework
+2. TypeScript configuration
+3. Playwright configuration
+4. All original feature files
+5. Migrated step definitions
+6. Migrated page objects
+7. Reusable fixtures
+8. Updated hooks
+9. Migrated utilities
+10. Environment configuration
+11. Reporting configuration
+12. Updated npm scripts
+13. Updated CI/CD configuration
+14. README documentation
+15. Migration coverage report
+16. Validation results
+
+Strict Migration Rules
+
+* Do not skip files.
+* Do not silently remove business logic.
+* Do not rewrite Gherkin scenarios unnecessarily.
+* Do not introduce arbitrary fixed waits.
+* Do not retain active Protractor dependencies.
+* Do not use Cucumber.js as a separate runner.
+* Do not replace Playwright fixtures with unnecessary global state.
+* Do not use JavaScript for migrated test source files.
+* Do not invent application locators.
+* Do not claim tests passed without executing them.
+* Do not stop after migrating one feature.
+* Do not modify application source code without approval.
+* Do not expose credentials or secrets.
+* Preserve test behavior and business coverage.
+
+Final Execution Instruction
+
+Analyze the entire repository first, then perform the migration in controlled batches until all relevant files have been processed.
+
+Start by creating a migration inventory and implementation plan.
+
+Then:
+
+1. Set up the new framework.
+2. Convert shared infrastructure.
+3. Convert every page object.
+4. Convert every step definition.
+5. Preserve every feature file.
+6. Migrate utilities and configuration.
+7. Run validation.
+8. Resolve migration-related failures.
+9. Remove obsolete dependencies.
+10. Produce the final migration report.
+
+Maintain a progress checklist throughout the process.
+
+If a file cannot be migrated automatically, document the blocker and continue processing independent files.
+
+Do not mark the project as fully migrated until all files are accounted for and the required validation has been completed.
+
+Expected result: A complete, maintainable, enterprise-ready Playwright BDD + TypeScript framework using the native Playwright Test runner, with the original Protractor project’s business scenarios and automation coverage preserved.
